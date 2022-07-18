@@ -1,0 +1,3 @@
+pylast~=5.0.0
+python-dotenv~=0.20.0
+rymscraper~=0.2.3
