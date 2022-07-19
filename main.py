@@ -78,11 +78,11 @@ def message(album_item: pylast.Album, index: int, total: int, prefix="", suffix=
 
 def clean_album_title(title: str) -> str:
 	for common_term in ["original", "version", "remastered", "mixtape", "deluxe", "edition", "extended", "the remaster",
-						"remaster", "expanded", "bonus track", "complete"]:
+						"remaster", "expanded", "bonus track", "complete", "live", "single"]:
 		title = title.lower().replace(common_term, "")
 
 	# Removes text within brackets
-	return re.sub("\\(.*?\\)", "", title).strip()
+	return re.sub("[(\\[].*?[)\\]]", "", title).strip()
 
 
 def clean_tags(items: list[str]) -> list[str]:
