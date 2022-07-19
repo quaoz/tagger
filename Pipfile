@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pylast = "~=5.0.0"
+python-dotenv = "~=0.20.0"
+rymscraper = {editable = true, path = "./rymscraper"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
