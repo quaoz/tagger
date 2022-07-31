@@ -2,6 +2,7 @@ import datetime
 import os
 import re
 import time
+import argparse
 
 import pylast
 from dotenv import load_dotenv
@@ -96,41 +97,71 @@ def clean_tags(items: list[str]) -> list[str]:
 
 
 if __name__ == '__main__':
-	# Whether existing tags should be removed or not
-	REMOVE_TAGS = True
+	parser = argparse.ArgumentParser(description="Tag last.fm albums with RYM genres")
+
+	parser.add_argument("--keep", action="store_true", help="keep existing last.fm tags")
+	parser.add_argument("--no-descriptors", action="store_true", help="don't use RYM descriptors as tags")
+	parser.add_argument("--no-auto-tag", action="store_true", help="don't add the auto-tagged tag")
+	parser.add_argument("--no-auto-skip", action="store_true", help="don't skip albums with the auto-tagged tag")
+	parser.add_argument("--week", action="store_true", help="only tag albums from the past week")
+	parser.add_argument("--print", action="store_true", help="print the tags")
+	parser.add_argument("--dry", action="store_true", help="stops tags from being submitted to last.fm")
+	parser.add_argument("--limit", required=False, type=int, help="number of albums to tag, unused when --week is used")
+	parser.add_argument("--skip", required=False, type=int,
+						help="skips a given number of albums, useful if the script stopped")
+
+	parser.add_argument("--key", metavar="API_KEY", required=False, type=str,
+						help="last.fm api key, can be specified in the .env file")
+	parser.add_argument("--secret", metavar="API_SECRET", required=False, type=str,
+						help="last.fm api secret, can be specified in the .env file")
+	parser.add_argument("--username", metavar="USERNAME", required=False, type=str,
+						help="last.fm username, can be specified in the .env file")
+	parser.add_argument("--password", metavar="HASH", required=False, type=str,
+						help="last.fm password md5 hash can be found using the --hash argument, can be specified in the "
+							 ".env file")
+	parser.add_argument("--hash", metavar="PASSWORD", required=False, type=str, help="last.fm password to hash")
+
+	args = parser.parse_args()
+
+	if args.hash is not None:
+		print(f"Password hash: {pylast.md5(args.hash)}")
+		exit(0)
+
+	# Whether existing last.fm tags should be removed or not
+	REMOVE_TAGS = not args.keep
 
 	# Whether RYM descriptors should be used as tags, disable if unsure what descriptors are
-	USE_DESCRIPTORS = True
+	USE_DESCRIPTORS = not args.no_descriptors
 
 	# Whether to add the auto-tagged tag (needed to skip already tagged albums, see SKIP_AUTO_TAGGED)
-	AUTO_TAGGED_TAG = True
+	AUTO_TAGGED_TAG = not args.no_auto_tag
 
 	# Whether to skip albums with the auto-tagged tag
-	SKIP_AUTO_TAGGED = True
+	SKIP_AUTO_TAGGED = not args.no_auto_skip
 
 	# Whether to only tag albums from the past week
-	TAG_THIS_WEEK = False
+	TAG_THIS_WEEK = args.week
 
 	# The number of albums to tag, ignored if tagging this week's albums (TAG_THIS_WEEK = True), set to the number of
 	# albums scrobbled to try and tag every album
-	ALBUM_LIMIT = 900
+	ALBUM_LIMIT = args.limit if args.limit is not None and args.limit > 0 else 1000
 
 	# Lets you skip a given number of albums, useful if the script was stopped after a number of albums as it allows you
 	# to continue from that point
-	SKIP_INDEX = 0
+	SKIP_INDEX = args.skip if args.skip is not None and args.skip > 0 else 0
 
 	# Whether to print the genres and descriptors from RYM
-	PRINT_TAGS = True
+	PRINT_TAGS = args.print
 
 	# Whether it should actually write the tags or just display them, if True no tags will be changed
-	DRY_RUN = True
+	DRY_RUN = args.dry
 
 	# Reads in the lastfm credentials
 	load_dotenv()
-	API_KEY = os.getenv("API_KEY")
-	API_SECRET = os.getenv("API_SECRET")
-	USERNAME = os.getenv("USERNAME")
-	PASSWORD_HASH = os.getenv("PASSWORD_HASH")
+	API_KEY = args.key if args.key is not None else os.getenv("API_KEY")
+	API_SECRET = args.secret if args.secret is not None else os.getenv("API_SECRET")
+	USERNAME = args.username if args.username is not None else os.getenv("USERNAME")
+	PASSWORD_HASH = args.hash if args.hash is not None else os.getenv("PASSWORD_HASH")
 
 	# Create lastfm network
 	lastfm_network = pylast.LastFMNetwork(
@@ -161,7 +192,8 @@ if __name__ == '__main__':
 	for i, album in enumerate(albums):
 		if i + 1 >= SKIP_INDEX:
 			if already_tagged(album.item):
-				message(album_item=album.item, index=i, total=album_count, prefix="Skipping: ", suffix="- already tagged")
+				message(album_item=album.item, index=i, total=album_count, prefix="Skipping: ",
+						suffix="- already tagged")
 			else:
 				found = True
 				try:

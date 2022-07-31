@@ -20,11 +20,34 @@ git clone https://github.com/dbeley/rymscraper.git
 pipenv shell
 pipenv install -e rymscraper
 pipenv install -r requirements.txt
+```
 
-# Check that the options defined in the script suite you. At the very least you will need to change DRY_RUN to False for the script to do anything but you should read through all the options.
-# The options begin after line 98 (if __name__ == '__main__':)
-nano main.py
+## Usage
 
-# Run the script
-python main.py
+```shell
+$ pipenv run python3 main.py --help
+
+usage: main.py [-h] [--keep] [--no-descriptors] [--no-auto-tag] [--no-auto-skip] [--week] [--print] [--dry] 
+			   [--limit LIMIT] [--skip SKIP] [--key API_KEY] [--secret API_SECRET] [--username USERNAME] 
+			   [--password HASH] [--hash PASSWORD]
+
+Tag last.fm albums with RYM genres
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --keep               keep existing last.fm tags
+  --no-descriptors     don't use RYM descriptors as tags
+  --no-auto-tag        don't add the auto-tagged tag
+  --no-auto-skip       don't skip albums with the auto-tagged tag
+  --week               only tag albums from the past week
+  --print              print the tags
+  --dry                stops tags from being submitted to last.fm
+  --limit LIMIT        number of albums to tag, unused when --week is used
+  --skip SKIP          skips a given number of albums, useful if the script stopped
+  --key API_KEY        last.fm api key, can be specified in the .env file
+  --secret API_SECRET  last.fm api secret, can be specified in the .env file
+  --username USERNAME  last.fm username, can be specified in the .env file
+  --password HASH      last.fm password md5 hash can be found using the --hash argument, can be specified in the .env file
+  --hash PASSWORD      last.fm password to hash
+
 ```
