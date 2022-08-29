@@ -60,7 +60,7 @@ def already_tagged(album_item: pylast.Album) -> bool:
 
 
 def message(album_item: pylast.Album, index: int, total: int, prefix="", suffix="", clean_name=False):
-	max_length = 160
+	max_length = 190
 	bar_length = 60
 
 	album_title = clean_album_title(album_item.title) if clean_name else album_item.title
