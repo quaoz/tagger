@@ -17,12 +17,12 @@ def get_tags(album_item: pylast.Album, clean_name: bool) -> list[str]:
 	rym_album = rym_network.get_album_infos(name=f"{album_item.artist} - {album_title}")
 
 	# Extract and process the genres and descriptors
-	genres = clean_tags(rym_album.get("Genres").replace("\n", ", ").split(", "))
+	genres = clean_tags(rym_album.get("Genres").split("\n"))
 	if PRINT_TAGS:
 		print(f"Genres:      {genres}")
 
 	if USE_DESCRIPTORS:
-		descriptors = clean_tags(rym_album.get("Descriptors").replace("\n", ", ").split(", "))
+		descriptors = clean_tags(rym_album.get("Descriptors").split("\n"))
 		if PRINT_TAGS:
 			print(f"Descriptors: {descriptors}")
 		genres = genres + descriptors
@@ -60,8 +60,8 @@ def already_tagged(album_item: pylast.Album) -> bool:
 
 
 def message(album_item: pylast.Album, index: int, total: int, prefix="", suffix="", clean_name=False):
-	max_length = 190
-	bar_length = 60
+	max_length = 170
+	bar_length = 50
 
 	album_title = clean_album_title(album_item.title) if clean_name else album_item.title
 
@@ -71,15 +71,15 @@ def message(album_item: pylast.Album, index: int, total: int, prefix="", suffix=
 	bar = "█" * filled_len + "-" * (bar_length - filled_len)
 
 	justify = " " * ((max_length - bar_length) - (
-			len(album_title) + len(str(album_item.artist)) + len(prefix) + len(suffix)))
-	print("%s%s by %s %s%s [%s] %s%s  %s/%s  ETA: %s" % (prefix, album_title, album_item.artist, suffix, justify, bar,
-														 percents, '%', index, total, str(datetime.timedelta(
-		seconds=(((time.time() - start) / (index + 1)) * (total - index))))))
+				len(album_title) + len(str(album_item.artist)) + len(prefix) + len(suffix)))
+	print("%s%s by %s %s%s [%s] %s%s  %s/%s  ETA: %s" % (
+	prefix, album_title, album_item.artist, suffix, justify, bar, percents, '%', index, total,
+	str(datetime.timedelta(seconds=(((time.time() - start) / (index + 1)) * (total - index))))))
 
 
 def clean_album_title(title: str) -> str:
 	for common_term in ["original", "version", "remastered", "mixtape", "deluxe", "edition", "extended", "the remaster",
-						"remaster", "expanded", "bonus track", "complete", "live", "single", "ep", "-"]:
+						"remaster", "expanded", "bonus track", "complete", "live", "single", "ep", "-", "&"]:
 		title = title.lower().replace(common_term, "")
 
 	# Removes text within brackets
@@ -97,7 +97,7 @@ def clean_tags(items: list[str]) -> list[str]:
 
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(description="Tag last.fm albums with RYM genres")
+	parser = argparse.ArgumentParser(description="Tag last.fm albums with RYM genres and descriptors")
 
 	parser.add_argument("--keep", action="store_true", help="keep existing last.fm tags")
 	parser.add_argument("--no-descriptors", action="store_true", help="don't use RYM descriptors as tags")
@@ -106,8 +106,10 @@ if __name__ == '__main__':
 	parser.add_argument("--week", action="store_true", help="only tag albums from the past week")
 	parser.add_argument("--print", action="store_true", help="print the tags")
 	parser.add_argument("--dry", action="store_true", help="stops tags from being submitted to last.fm")
-	parser.add_argument("--limit", required=False, type=int, help="number of albums to tag, unused when --week is used")
-	parser.add_argument("--skip", required=False, type=int,
+
+	parser.add_argument("--limit", required=False, type=int, default=1000,
+						help="number of albums to tag, unused when --week is used")
+	parser.add_argument("--skip", required=False, type=int, default=0,
 						help="skips a given number of albums, useful if the script stopped")
 
 	parser.add_argument("--key", metavar="API_KEY", required=False, type=str,
@@ -117,10 +119,10 @@ if __name__ == '__main__':
 	parser.add_argument("--username", metavar="USERNAME", required=False, type=str,
 						help="last.fm username, can be specified in the .env file")
 	parser.add_argument("--password", metavar="HASH", required=False, type=str,
-						help="last.fm password md5 hash can be found using the --hash argument, can be specified in the "
-							 ".env file")
+						help="last.fm password md5 hash can be found using the --hash argument, can be specified in the .env file")
 	parser.add_argument("--hash", metavar="PASSWORD", required=False, type=str, help="last.fm password to hash")
 
+	parser.format_help()
 	args = parser.parse_args()
 
 	if args.hash is not None:
@@ -144,11 +146,11 @@ if __name__ == '__main__':
 
 	# The number of albums to tag, ignored if tagging this week's albums (TAG_THIS_WEEK = True), set to the number of
 	# albums scrobbled to try and tag every album
-	ALBUM_LIMIT = args.limit if args.limit is not None and args.limit > 0 else 1000
+	ALBUM_LIMIT = args.limit
 
 	# Lets you skip a given number of albums, useful if the script was stopped after a number of albums as it allows you
 	# to continue from that point
-	SKIP_INDEX = args.skip if args.skip is not None and args.skip > 0 else 0
+	SKIP_INDEX = args.skip
 
 	# Whether to print the genres and descriptors from RYM
 	PRINT_TAGS = args.print
@@ -210,3 +212,5 @@ if __name__ == '__main__':
 				if found:
 					tag_album(album.item, album_tags)
 				time.sleep(2.5)
+
+	rym_network.browser.quit()
