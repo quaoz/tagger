@@ -5,6 +5,9 @@ A script to tag scrobbled albums on [last.fm](https://last.fm) with genres (and 
 ## Installation
 
 ```shell
+# Install pipenv (https://pipenv.pypa.io/)
+pip3 install pipenv
+
 # Clone this repository
 git clone https://github.com/quaoz/tagger.git
 cd tagger
@@ -24,12 +27,12 @@ pipenv install -r requirements.txt
 
 ## Usage
 
-```shell
+```
 $ pipenv run python3 main.py --help
 
-usage: main.py [-h] [--keep] [--no-descriptors] [--no-auto-tag] [--no-auto-skip] [--week] [--print] [--dry] 
-			   [--limit LIMIT] [--skip SKIP] [--key API_KEY] [--secret API_SECRET] [--username USERNAME] 
-			   [--password HASH] [--hash PASSWORD]
+usage: main.py [-h] [--keep] [--no-descriptors] [--no-auto-tag] [--no-auto-skip] [--week] 
+      [--print] [--dry] [--limit LIMIT] [--skip SKIP] [--key API_KEY] [--secret API_SECRET]
+      [--username USERNAME] [--password HASH] [--hash PASSWORD]
 
 Tag last.fm albums with RYM genres
 
@@ -47,7 +50,7 @@ optional arguments:
   --key API_KEY        last.fm api key, can be specified in the .env file
   --secret API_SECRET  last.fm api secret, can be specified in the .env file
   --username USERNAME  last.fm username, can be specified in the .env file
-  --password HASH      last.fm password md5 hash can be found using the --hash argument, can be specified in the .env file
+  --password HASH      last.fm password md5 hash can be found using the --hash argument, 
+                       can be specified in the .env file
   --hash PASSWORD      last.fm password to hash
-
 ```
