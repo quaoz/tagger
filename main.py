@@ -20,12 +20,12 @@ def get_tags(album_item: pylast.Album, clean_name: bool) -> list[str]:
 
 	# Extract and process the genres and descriptors
 	genres = clean_tags(re.split(r'\n|,', rym_album.get("Genres")))
-	if PRINT_TAGS:
+	if PRINT_TAGS and not SILENT:
 		print(f"Genres:      {genres}")
 
 	if USE_DESCRIPTORS:
 		descriptors = clean_tags(re.split(r'\n|,', rym_album.get("Descriptors")))
-		if PRINT_TAGS:
+		if PRINT_TAGS and not SILENT:
 			print(f"Descriptors: {descriptors}")
 		genres = genres + descriptors
 
@@ -62,6 +62,9 @@ def already_tagged(album_item: pylast.Album) -> bool:
 
 
 def message(album_item: pylast.Album, index: int, total: int, prefix="", suffix="", clean_name=False):
+	if SILENT:
+		return
+
 	max_length = 170
 	bar_length = 50
 
@@ -107,6 +110,7 @@ if __name__ == '__main__':
 	parser.add_argument("--no-auto-skip", action="store_true", help="don't skip albums with the auto-tagged tag")
 	parser.add_argument("--week", action="store_true", help="only tag albums from the past week")
 	parser.add_argument("--print", action="store_true", help="print the tags")
+	parser.add_argument("--silent", action="store_true", help="silences the script")
 	parser.add_argument("--dry", action="store_true", help="stops tags from being submitted to last.fm")
 
 	parser.add_argument("--limit", required=False, type=int, default=1000,
@@ -157,6 +161,9 @@ if __name__ == '__main__':
 	# Whether to print the genres and descriptors from RYM
 	PRINT_TAGS = args.print
 
+	# Whether to silence the script
+	SILENT = args.silent
+
 	# Whether it should actually write the tags or just display them, if True no tags will be changed
 	DRY_RUN = args.dry
 
@@ -184,35 +191,39 @@ if __name__ == '__main__':
 	albums = get_albums()
 	album_count = len(albums)
 
-	print(
-		f"CONFIG: REMOVE_TAGS: {REMOVE_TAGS}, USE_DESCRIPTORS: {USE_DESCRIPTORS}, AUTO_TAGGED_TAG: {AUTO_TAGGED_TAG}, "
-		f"SKIP_AUTO_TAGGED: {SKIP_AUTO_TAGGED}, TAG_THIS_WEEK: {TAG_THIS_WEEK}, ALBUM_LIMIT: {ALBUM_LIMIT}, SKIP_INDEX:"
-		f" {SKIP_INDEX}, DRY_RUN: {DRY_RUN}, album_count: {album_count}, user: "
-		f"{lastfm_network.get_authenticated_user().name}\n"
-	)
+	if not SILENT:
+		print(
+			f"CONFIG: REMOVE_TAGS: {REMOVE_TAGS}, USE_DESCRIPTORS: {USE_DESCRIPTORS}, AUTO_TAGGED_TAG: {AUTO_TAGGED_TAG}, "
+			f"SKIP_AUTO_TAGGED: {SKIP_AUTO_TAGGED}, TAG_THIS_WEEK: {TAG_THIS_WEEK}, ALBUM_LIMIT: {ALBUM_LIMIT}, SKIP_INDEX:"
+			f" {SKIP_INDEX}, DRY_RUN: {DRY_RUN}, album_count: {album_count}, user: "
+			f"{lastfm_network.get_authenticated_user().name}\n"
+		)
 
 	start = time.time()
 
 	for i, album in enumerate(albums):
 		if i + 1 >= SKIP_INDEX:
 			if already_tagged(album.item):
-				message(album_item=album.item, index=i, total=album_count, prefix="Skipping: ",
-						suffix="- already tagged")
+				message(
+					album_item=album.item, index=i, total=album_count, prefix="Skipping: ", suffix="- already tagged")
 			else:
 				found = True
 				try:
 					album_tags = get_tags(album.item, False)
 				except (IndexError, AttributeError, TypeError) as e:
-					print(
-						f"Unable to find {album.item.title} by {album.item.artist} on RYM - trying to sanitize the album title...")
+					if not SILENT:
+						print(
+							f"Unable to find {album.item.title} by {album.item.artist} on RYM - trying to sanitize the album title...")
 					try:
 						album_tags = get_tags(album.item, True)
 					except (IndexError, AttributeError, TypeError) as e:
-						print(f"Unable to find {clean_album_title(album.item.title)} by {album.item.artist} on RYM")
+						if not SILENT:
+							print(f"Unable to find {clean_album_title(album.item.title)} by {album.item.artist} on RYM")
 						found = False
 
 				if found:
 					tag_album(album.item, album_tags)
 				time.sleep(2.5)
 
+	rym_network.browser.close()
 	rym_network.browser.quit()

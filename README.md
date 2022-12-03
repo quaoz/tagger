@@ -31,8 +31,8 @@ pipenv install -r requirements.txt
 $ pipenv run python3 main.py --help
 
 usage: main.py [-h] [--keep] [--no-descriptors] [--no-auto-tag] [--no-auto-skip] [--week] 
-      [--print] [--dry] [--limit LIMIT] [--skip SKIP] [--key API_KEY] [--secret API_SECRET]
-      [--username USERNAME] [--password HASH] [--hash PASSWORD]
+      [--print] [--silent] [--dry] [--limit LIMIT] [--skip SKIP] [--key API_KEY] 
+      [--secret API_SECRET] [--username USERNAME] [--password HASH] [--hash PASSWORD]
 
 Tag last.fm albums with RYM genres
 
@@ -44,6 +44,7 @@ optional arguments:
   --no-auto-skip       don't skip albums with the auto-tagged tag
   --week               only tag albums from the past week
   --print              print the tags
+  --silent             silences the script
   --dry                stops tags from being submitted to last.fm
   --limit LIMIT        number of albums to tag, unused when --week is used
   --skip SKIP          skips a given number of albums, useful if the script stopped
