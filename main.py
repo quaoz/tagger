@@ -17,12 +17,12 @@ def get_tags(album_item: pylast.Album, clean_name: bool) -> list[str]:
 	rym_album = rym_network.get_album_infos(name=f"{album_item.artist} - {album_title}")
 
 	# Extract and process the genres and descriptors
-	genres = clean_tags(rym_album.get("Genres").split("\n"))
+	genres = clean_tags(re.split(r'\n|,', rym_album.get("Genres")))
 	if PRINT_TAGS:
 		print(f"Genres:      {genres}")
 
 	if USE_DESCRIPTORS:
-		descriptors = clean_tags(rym_album.get("Descriptors").split("\n"))
+		descriptors = clean_tags(re.split(r'\n|,', rym_album.get("Descriptors")))
 		if PRINT_TAGS:
 			print(f"Descriptors: {descriptors}")
 		genres = genres + descriptors
