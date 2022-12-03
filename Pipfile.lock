@@ -1,12 +1,10 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "61f3189d2ad7513127f66b9d8bfc22ccae3975af6db07abdb937c55a524f6706"
+            "sha256": "0db57c59177da6f9f998b13d06fbef01ecb2c02cc417f9717af83933b1a9c4b7"
         },
         "pipfile-spec": 6,
-        "requires": {
-            "python_version": "3.9"
-        },
+        "requires": {},
         "sources": [
             {
                 "name": "pypi",
@@ -257,11 +255,11 @@
         },
         "pylast": {
             "hashes": [
-                "sha256:3d6269d3c16ec0c26ae47ccffaef4d4ea60fe40355f5170437711f65f19d1f50",
-                "sha256:5018b66c2b4632d71abd8103b73e66e4dd14c6609a8f7ba7e5aa26c736df2df8"
+                "sha256:73cc7429a57e4965b3769254b1cb9625cdd910d3ac26cb0a1dd57145cdc498c0",
+                "sha256:89300fdcdf423d7be0606bdc44da27c3b48c4d73aa1d4cb12672cc006c979bdc"
             ],
             "index": "pypi",
-            "version": "==5.0.0"
+            "version": "==5.1.0"
         },
         "pysocks": {
             "hashes": [
@@ -281,11 +279,11 @@
         },
         "python-dotenv": {
             "hashes": [
-                "sha256:b7e3b04a59693c42c36f9ab1cc2acc46fa5df8c78e178fc33a8d4cd05c8d498f",
-                "sha256:d92a187be61fe482e4fd675b6d52200e7be63a12b724abbf931a40ce4fa92938"
+                "sha256:1684eb44636dd462b66c3ee016599815514527ad99965de77f43e0944634a7e5",
+                "sha256:b77d08274639e3d34145dfa6c7008e66df0f04b7be7a75fd0d5292c191d79045"
             ],
             "index": "pypi",
-            "version": "==0.20.0"
+            "version": "==0.21.0"
         },
         "pytz": {
             "hashes": [
