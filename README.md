@@ -22,7 +22,6 @@ git clone https://github.com/dbeley/rymscraper.git
 # Create the pipenv and install the requirements
 pipenv shell
 pipenv install -e rymscraper
-pipenv install -r requirements.txt
 ```
 
 ## Usage
