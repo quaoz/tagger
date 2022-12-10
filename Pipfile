@@ -4,6 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pylast = "~=5.1.0"
-python-dotenv = "~=0.21.0"
+pylast = "*"
 rymscraper = {editable = true, path = "./rymscraper"}
+python-dotenv = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.10"
