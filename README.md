@@ -5,23 +5,20 @@ A script to tag scrobbled albums on [last.fm](https://last.fm) with genres (and 
 ## Installation
 
 ```shell
-# Install pipenv (https://pipenv.pypa.io/)
-pip3 install pipenv
-
 # Clone this repository
 git clone https://github.com/quaoz/tagger.git
 cd tagger
 
 # Rename example.env to .env and fill in your details
 cp example.env .env
-nano .env
+nvim .env
 
-# Clone rymscraper
+# Clone and install rymscraper
 git clone https://github.com/dbeley/rymscraper.git
+python3 rymscraper/setup.py install
 
-# Create the pipenv and install the requirements
-pipenv shell
-pipenv install -e rymscraper
+# Install the requirements
+pip3 install -r requirements.txt
 ```
 
 ## Usage
