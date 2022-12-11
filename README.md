@@ -24,7 +24,7 @@ pip3 install -r requirements.txt
 ## Usage
 
 ```
-$ pipenv run python3 main.py --help
+$ python3 main.py --help
 
 usage: main.py [-h] [--keep] [--no-descriptors] [--no-auto-tag] [--no-auto-skip] [--week] 
       [--print] [--silent] [--dry] [--limit LIMIT] [--skip SKIP] [--key API_KEY] 
