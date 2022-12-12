@@ -13,11 +13,16 @@ cd tagger
 cp example.env .env
 nvim .env
 
-# Clone and install rymscraper
+# Clone rymscraper
 git clone https://github.com/dbeley/rymscraper.git
-python3 rymscraper/setup.py install
 
-# Install the requirements
+# Install the requirements with pipenv
+pipenv install -e rymscraper
+pipenv install -r requirements.txt
+
+# Or install with pip if you do not want to use pipenv, if installed 
+# without pienv you can just use "python3 main.py" to run the script
+python3 rymscraper/setup.py install
 pip3 install -r requirements.txt
 ```
 

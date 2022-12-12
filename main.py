@@ -8,7 +8,7 @@ import argparse
 
 import pylast
 from dotenv import load_dotenv
-from rymscraper import rymscraper
+from rymscraper.rymscraper import rymscraper
 
 
 def get_tags(album_item: pylast.Album, clean_name: bool) -> list[str]:
