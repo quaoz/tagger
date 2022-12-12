@@ -201,11 +201,15 @@ if __name__ == '__main__':
 
 	start = time.time()
 
+	not_found = 0
+	skipped = 0	
+	tagged = 0
+
 	for i, album in enumerate(albums):
-		if i + 1 >= SKIP_INDEX:
+		if i >= SKIP_INDEX:
 			if already_tagged(album.item):
-				message(
-					album_item=album.item, index=i, total=album_count, prefix="Skipping: ", suffix="- already tagged")
+				skipped += 1
+				message(album_item=album.item, index=i, total=album_count, prefix="Skipping: ", suffix="- already tagged")
 			else:
 				found = True
 				try:
@@ -220,10 +224,13 @@ if __name__ == '__main__':
 						if not SILENT:
 							print(f"Unable to find {clean_album_title(album.item.title)} by {album.item.artist} on RYM")
 						found = False
+						not_found += 1
 
 				if found:
+					tagged += 1
 					tag_album(album.item, album_tags)
 				time.sleep(2.5)
 
+	print(f"\nFrom {album_count} albums skipping the first {SKIP_INDEX}, {tagged} were tagged, {skipped} were skipped ({SKIP_INDEX + skipped} in total) and {not_found} were not found.")
 	rym_network.browser.close()
 	rym_network.browser.quit()
