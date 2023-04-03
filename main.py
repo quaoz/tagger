@@ -14,17 +14,18 @@ from rymscraper.rymscraper import rymscraper
 def get_tags(album_item: pylast.Album, clean_name: bool) -> list[str]:
 	message(album_item, i, album_count, clean_name=clean_name)
 	album_title = clean_album_title(album_item.title) if clean_name else album_item.title
+	artist_name = clean_artist_name(album_item.artist.name) if clean_name else album_item.artist.name
 
 	# Retrieve the album from RYM
-	rym_album = rym_network.get_album_infos(name=f"{album_item.artist} - {album_title}")
+	rym_album = rym_network.get_album_infos(name=f"{artist_name} - {album_title}")
 
 	# Extract and process the genres and descriptors
-	genres = clean_tags(re.split(r'\n|,', rym_album.get("Genres")))
+	genres = clean_tags(re.split(r'[\n,]', rym_album.get("Genres")))
 	if PRINT_TAGS and not SILENT:
 		print(f"Genres:      {genres}")
 
 	if USE_DESCRIPTORS:
-		descriptors = clean_tags(re.split(r'\n|,', rym_album.get("Descriptors")))
+		descriptors = clean_tags(re.split(r'[\n,]', rym_album.get("Descriptors")))
 		if PRINT_TAGS and not SILENT:
 			print(f"Descriptors: {descriptors}")
 		genres = genres + descriptors
@@ -69,6 +70,7 @@ def message(album_item: pylast.Album, index: int, total: int, prefix="", suffix=
 	bar_length = 50
 
 	album_title = clean_album_title(album_item.title) if clean_name else album_item.title
+	artist_name = clean_artist_name(album_item.artist.name) if clean_name else album_item.artist.name
 
 	# Fancy progress bar stuff
 	filled_len = int(round(bar_length * index / float(total)))
@@ -76,9 +78,9 @@ def message(album_item: pylast.Album, index: int, total: int, prefix="", suffix=
 	bar = "█" * filled_len + "-" * (bar_length - filled_len)
 
 	justify = " " * ((max_length - bar_length) - (
-				len(album_title) + len(str(album_item.artist)) + len(prefix) + len(suffix)))
+				len(album_title) + len(artist_name) + len(prefix) + len(suffix)))
 	print("%s%s by %s %s%s [%s] %s%s  %s/%s  ETA: %s" % (
-	prefix, album_title, album_item.artist, suffix, justify, bar, percents, '%', index, total,
+	prefix, album_title, artist_name, suffix, justify, bar, percents, '%', index, total,
 	str(datetime.timedelta(seconds=(((time.time() - start) / (index + 1)) * (total - index))))))
 
 
@@ -90,6 +92,9 @@ def clean_album_title(title: str) -> str:
 	# Removes text within brackets
 	return re.sub("[(\\[].*?[)\\]]", "", title).strip()
 
+def clean_artist_name(name :str) -> str:
+	# Removes all non-alphanumeric characters, only works with english names
+	return re.sub(r"[^0-9a-zA-Z ]+", "", name.lower()).strip()
 
 def clean_tags(items: list[str]) -> list[str]:
 	tags = []
@@ -202,7 +207,7 @@ if __name__ == '__main__':
 	start = time.time()
 
 	not_found = 0
-	skipped = 0	
+	skipped = 0
 	tagged = 0
 
 	for i, album in enumerate(albums):
@@ -217,19 +222,19 @@ if __name__ == '__main__':
 				except (IndexError, AttributeError, TypeError) as e:
 					if not SILENT:
 						print(
-							f"Unable to find {album.item.title} by {album.item.artist} on RYM - trying to sanitize the album title...")
+							f"Unable to find {album.item.title} by {album.item.artist.name} on RYM - trying to sanitize the album title...")
 					try:
 						album_tags = get_tags(album.item, True)
 					except (IndexError, AttributeError, TypeError) as e:
 						if not SILENT:
-							print(f"Unable to find {clean_album_title(album.item.title)} by {album.item.artist} on RYM")
+							print(f"Unable to find {clean_album_title(album.item.title)} by {clean_artist_name(album.item.artist.name)} on RYM")
 						found = False
 						not_found += 1
 
 				if found:
 					tagged += 1
 					tag_album(album.item, album_tags)
-				time.sleep(2.5)
+				time.sleep(2)
 
 	print(f"\nFrom {album_count} albums skipping the first {SKIP_INDEX}, {tagged} were tagged, {skipped} were skipped ({SKIP_INDEX + skipped} in total) and {not_found} were not found.")
 	rym_network.browser.close()
